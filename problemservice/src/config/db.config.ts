@@ -18,6 +18,8 @@ export const connectDB = async () => {
         logger.warn("MongoDB connection disconnected");
     })
 
+    console.log("Database connection established");
+
     process.on("SIGINT", async() => {
         await mongoose.connection.close();
         logger.info("Mongo DB connection closed due to app termination");
