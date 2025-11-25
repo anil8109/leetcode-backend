@@ -8,7 +8,7 @@ export interface ITestCase {
 export interface IProblem extends Document {
     title: string;
     description: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
+    difficulty: "Easy" | "Medium" | "Hard";
     createdAt: Date;
     updatedAt: Date;
     editorial?: string;
@@ -44,7 +44,11 @@ const problemSchema = new mongoose.Schema<IProblem>({
     },
     difficulty: {
         type: String,
-        enum: ['Easy', 'Medium', 'Hard'],
+        enum: {
+            values: ['Easy', 'Medium', 'Hard'],
+            message: "Invalid difficulty level"
+        },
+        default: 'Easy',
         required: [true, "Difficulty is required"]
     },
     editorial: {
@@ -54,10 +58,18 @@ const problemSchema = new mongoose.Schema<IProblem>({
     },
     testCases: [testcaseSchema]
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+        transform: (_: any, record: any) => {
+            delete (record as any).__v;
+            record.id = record._id; //need to check why not working 
+            delete record._id;
+            return record;
+        }
+    }
 });
 
 problemSchema.index({ title: 1 }, { unique: true });
 problemSchema.index({ difficulty: 1 });
 
-export const ProblemModel = mongoose.model<IProblem>("Problem", problemSchema);
+export const Problem = mongoose.model<IProblem>("Problem", problemSchema);
